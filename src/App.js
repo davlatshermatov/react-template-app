@@ -1,25 +1,70 @@
-import logo from './logo.svg';
-import './App.css';
+import LanguageProvider from "./i18n/Provider";
+import { LOCALES } from "./i18n/constants";
+import { connect } from "react-redux";
+import { setLanguage } from "./redux/language/language";
+import { getAllPost } from "./redux/post/post";
+import { useEffect, useState } from "react";
+import translate from "./i18n/translate";
 
-function App() {
+function App({ getAllPost, posts }) {
+  useEffect(() => {
+    getAllPost();
+  }, [getAllPost]);
+
+  const [language, setLanguage] = useState(LOCALES.ENGLISH);
+
+  const setLocale = (locale) => {
+    setLanguage(locale);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <LanguageProvider locale={language}>
+      <h1>{translate("hello")}</h1>
+      <div>
+        <button
+          disabled={language === LOCALES.UZBEK}
+          onClick={() => {
+            setLocale(LOCALES.UZBEK);
+          }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          Uzbek
+        </button>
+        <button
+          disabled={language === LOCALES.ENGLISH}
+          onClick={() => {
+            setLocale(LOCALES.ENGLISH);
+          }}
+        >
+          English
+        </button>
+        <button
+          disabled={language === LOCALES.RUSSIAN}
+          onClick={() => {
+            setLocale(LOCALES.RUSSIAN);
+          }}
+        >
+          Russian
+        </button>
+      </div>
+      <hr />
+      {posts.map((post) => (
+        <div key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.body}</p>
+        </div>
+      ))}
+    </LanguageProvider>
   );
 }
 
-export default App;
+export default connect(
+  ({ postReducer: { posts } }) => {
+    console.log("posts", posts);
+    return {
+      posts,
+    };
+  },
+  {
+    getAllPost,
+  }
+)(App);
