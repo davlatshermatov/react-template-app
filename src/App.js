@@ -6,12 +6,10 @@ import { getAllPost } from "./redux/post/post";
 import { useEffect, useState } from "react";
 import translate from "./i18n/translate";
 
-function App({ getAllPost, posts }) {
+function App({ getAllPost, posts, language, setLanguage }) {
   useEffect(() => {
     getAllPost();
   }, [getAllPost]);
-
-  const [language, setLanguage] = useState(LOCALES.ENGLISH);
 
   const setLocale = (locale) => {
     setLanguage(locale);
@@ -58,13 +56,15 @@ function App({ getAllPost, posts }) {
 }
 
 export default connect(
-  ({ postReducer: { posts } }) => {
-    console.log("posts", posts);
+  ({ postReducer: { posts }, languageReducer: { language } }) => {
+    console.log("posts", posts, "language", language);
     return {
       posts,
+      language,
     };
   },
   {
     getAllPost,
+    setLanguage,
   }
 )(App);
